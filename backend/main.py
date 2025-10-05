@@ -42,9 +42,10 @@ AUDIO_DIR = pathlib.Path("audio_sessions")
 SPECTROGRAM_DIR = pathlib.Path("spectrograms")
 ANALYSIS_DIR = pathlib.Path("llm_analysis")
 SESSIONS_DIR = pathlib.Path("sessions")
+REPORTS_DIR = pathlib.Path("reports")
 
 # Create directories
-for dir_path in [AUDIO_DIR, SPECTROGRAM_DIR, ANALYSIS_DIR, SESSIONS_DIR]:
+for dir_path in [AUDIO_DIR, SPECTROGRAM_DIR, ANALYSIS_DIR, SESSIONS_DIR, REPORTS_DIR]:
     dir_path.mkdir(parents=True, exist_ok=True)
 
 # ============================================================================
@@ -175,10 +176,34 @@ async def analyze_voice(
             except json.JSONDecodeError:
                 raise HTTPException(status_code=400, detail="Invalid user_metadata JSON")
 
-        # Save uploaded audio file
+        # Save uploaded audio file (convert to WAV if needed)
+        temp_path = AUDIO_DIR / f"{session_id}_temp"
         audio_path = AUDIO_DIR / f"{session_id}.wav"
-        with open(audio_path, "wb") as buffer:
+
+        with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(audio.file, buffer)
+
+        # Convert to WAV format using pydub
+        print(f"[Voice] Converting audio file: {temp_path}")
+        try:
+            from pydub import AudioSegment
+            # Explicitly specify input format as webm
+            print(f"[Voice] Loading audio file...")
+            audio_segment = AudioSegment.from_file(str(temp_path), format="webm")
+            print(f"[Voice] Converting to WAV...")
+            audio_segment.export(str(audio_path), format="wav")
+            print(f"[Voice] Conversion successful, deleting temp file")
+            temp_path.unlink()  # Delete temp file
+        except Exception as e:
+            print(f"[Voice] Conversion failed: {e}")
+            # If conversion fails, try without specifying format
+            try:
+                audio_segment = AudioSegment.from_file(str(temp_path))
+                audio_segment.export(str(audio_path), format="wav")
+                temp_path.unlink()
+            except Exception as e2:
+                print(f"[Voice] Second conversion attempt failed: {e2}")
+                raise ValueError(f"Audio conversion failed: {e2}")
 
         # Generate spectrogram
         spectrogram_path, acoustic_features, spec_metadata = generate_spectrogram_from_audio(
@@ -205,7 +230,10 @@ async def analyze_voice(
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Voice analysis failed: {str(e)}")
+        import traceback
+        error_detail = f"Voice analysis failed: {str(e)}\n{traceback.format_exc()}"
+        print(f"[ERROR] {error_detail}")
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @app.get("/api/voice/spectrogram/{session_id}")
 async def get_spectrogram(session_id: str):
@@ -216,6 +244,65 @@ async def get_spectrogram(session_id: str):
         raise HTTPException(status_code=404, detail="Spectrogram not found")
 
     return FileResponse(spectrogram_path, media_type="image/png")
+
+@app.get("/api/voice/report/{session_id}")
+async def generate_report(session_id: str):
+    """
+    Generate comprehensive PD screening report for a session
+
+    Returns HTML report with all analysis results
+    """
+    try:
+        from report_generator import PDReportGenerator
+
+        # Load typing results if available
+        typing_results = None
+        typing_path = SESSIONS_DIR / f"{session_id}_keystroke.json"
+        if typing_path.exists():
+            with open(typing_path, 'r') as f:
+                typing_data = json.load(f)
+                typing_results = {
+                    "session_id": typing_data.get("session_id"),
+                    "score_0to1": typing_data.get("risk_score"),
+                    "band": typing_data.get("model_source"),
+                    "features": typing_data.get("features")
+                }
+
+        # Load voice results if available
+        voice_results = None
+        analysis_path = ANALYSIS_DIR / f"{session_id}_llm_analysis.json"
+        if analysis_path.exists():
+            with open(analysis_path, 'r') as f:
+                voice_results = {
+                    "session_id": session_id,
+                    "llm_analysis": json.load(f)
+                }
+
+        # Get spectrogram path
+        spectrogram_path = SPECTROGRAM_DIR / f"{session_id}_spectrogram.png"
+        if not spectrogram_path.exists():
+            spectrogram_path = None
+
+        # Generate report
+        generator = PDReportGenerator(output_dir=REPORTS_DIR)
+        report_path = generator.generate_html_report(
+            session_id=session_id,
+            typing_results=typing_results,
+            voice_results=voice_results,
+            spectrogram_path=spectrogram_path
+        )
+
+        return FileResponse(
+            report_path,
+            media_type="text/html",
+            filename=f"PD_Screening_Report_{session_id}.html"
+        )
+
+    except Exception as e:
+        import traceback
+        error_detail = f"Report generation failed: {str(e)}\n{traceback.format_exc()}"
+        print(f"[ERROR] {error_detail}")
+        raise HTTPException(status_code=500, detail=error_detail)
 
 # ============================================================================
 # Keystroke Analysis Endpoints

@@ -9,6 +9,10 @@ import json
 import pathlib
 from datetime import datetime
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 class LLMAudioAnalyzer:
@@ -53,10 +57,10 @@ class LLMAudioAnalyzer:
         # Construct analysis prompt
         prompt = self._build_analysis_prompt(acoustic_features, user_metadata)
 
-        # Call Claude API
+        # Call Claude API (using latest Claude 3.7 Sonnet)
         message = self.client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=2048,
+            model="claude-3-7-sonnet-20250219",
+            max_tokens=4096,
             messages=[
                 {
                     "role": "user",
@@ -87,7 +91,7 @@ class LLMAudioAnalyzer:
             "acoustic_features": acoustic_features,
             "metadata": {
                 "timestamp": datetime.now().isoformat(),
-                "model": "claude-3-5-sonnet-20241022",
+                "model": "claude-3-7-sonnet-20250219",
                 "spectrogram_path": str(image_path),
                 "user_metadata": user_metadata
             }

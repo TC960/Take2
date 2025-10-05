@@ -21,6 +21,7 @@ const ResultsPage = () => {
   const navigate = useNavigate();
   const [typingResults, setTypingResults] = useState<TypingResults | null>(null);
   const [voiceResults, setVoiceResults] = useState<VoiceResults | null>(null);
+  const [parsedVoiceAnalysis, setParsedVoiceAnalysis] = useState<any>(null);
   const [overallRisk, setOverallRisk] = useState<number>(0);
   const [riskCategory, setRiskCategory] = useState<string>("unknown");
 
@@ -34,7 +35,20 @@ const ResultsPage = () => {
     }
 
     if (voiceData) {
-      setVoiceResults(JSON.parse(voiceData));
+      const voice = JSON.parse(voiceData);
+      setVoiceResults(voice);
+
+      // Parse LLM raw_response if it's a string
+      if (voice?.llm_analysis?.raw_response) {
+        try {
+          const parsed = typeof voice.llm_analysis.raw_response === 'string'
+            ? JSON.parse(voice.llm_analysis.raw_response)
+            : voice.llm_analysis.raw_response;
+          setParsedVoiceAnalysis(parsed);
+        } catch (e) {
+          console.error("Failed to parse LLM response:", e);
+        }
+      }
     }
 
     // Calculate overall risk
@@ -51,8 +65,19 @@ const ResultsPage = () => {
       risks.push(typing.score_0to1);
     }
 
-    if (voice?.llm_analysis?.risk_assessment?.overall_risk_score !== undefined) {
-      risks.push(voice.llm_analysis.risk_assessment.overall_risk_score);
+    // Parse voice analysis
+    if (voice?.llm_analysis?.raw_response) {
+      try {
+        const parsed = typeof voice.llm_analysis.raw_response === 'string'
+          ? JSON.parse(voice.llm_analysis.raw_response)
+          : voice.llm_analysis.raw_response;
+
+        if (parsed?.risk_assessment?.overall_risk_score !== undefined) {
+          risks.push(parsed.risk_assessment.overall_risk_score);
+        }
+      } catch (e) {
+        console.error("Failed to parse voice risk:", e);
+      }
     }
 
     if (risks.length > 0) {
@@ -190,29 +215,49 @@ const ResultsPage = () => {
               <h3 className="text-xl font-bold">Voice Analysis</h3>
             </div>
 
-            {voiceResults?.llm_analysis ? (
+            {parsedVoiceAnalysis?.risk_assessment ? (
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Risk Category</span>
                   <span className={`text-2xl font-bold ${getRiskColor(
-                    voiceResults.llm_analysis.risk_assessment?.risk_category || "unknown"
+                    parsedVoiceAnalysis.risk_assessment.risk_category || "unknown"
                   )}`}>
-                    {voiceResults.llm_analysis.risk_assessment?.risk_category?.toUpperCase() || "N/A"}
+                    {parsedVoiceAnalysis.risk_assessment.risk_category?.toUpperCase() || "N/A"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Confidence</span>
                   <span className="font-semibold">
-                    {voiceResults.llm_analysis.risk_assessment?.confidence
-                      ? `${(voiceResults.llm_analysis.risk_assessment.confidence * 100).toFixed(0)}%`
+                    {parsedVoiceAnalysis.risk_assessment.confidence
+                      ? `${(parsedVoiceAnalysis.risk_assessment.confidence * 100).toFixed(0)}%`
                       : "N/A"}
                   </span>
                 </div>
                 <div className="pt-2 border-t">
                   <p className="text-xs text-muted-foreground">
-                    Session ID: {voiceResults.session_id}
+                    Session ID: {voiceResults?.session_id}
                   </p>
                 </div>
+                {voiceResults?.session_id && (
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      onClick={() => window.open(`http://localhost:8000/api/voice/spectrogram/${voiceResults.session_id}`, '_blank')}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      View Spectrogram
+                    </Button>
+                    <Button
+                      onClick={() => window.open(`http://localhost:8000/api/voice/report/${voiceResults.session_id}`, '_blank')}
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      Download Report
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
@@ -242,7 +287,7 @@ const ResultsPage = () => {
         </div>
 
         {/* Recommendations */}
-        {(typingResults || voiceResults) && (
+        {(typingResults || parsedVoiceAnalysis) && (
           <Card className="p-6 space-y-4">
             <h3 className="text-xl font-bold">Recommendations</h3>
             <ul className="space-y-2 text-sm">

@@ -1,0 +1,19 @@
+{
+  "raw_response": "{\n  \"risk_assessment\": {\n    \"overall_risk_score\": 0.4,\n    \"confidence\": 0.75,\n    \"risk_category\": \"moderate\"\n  },\n  \"biomarker_findings\": {\n    \"vocal_tremor\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"No significant 4-6 Hz modulation visible in spectrogram, tremor band ratio is 0.0\"\n    },\n    \"frequency_instability\": {\n      \"detected\": true,\n      \"severity\": \"mild\",\n      \"evidence\": \"Moderate spectral centroid variability (std=113.26), visible jitter in harmonic structure\"\n    },\n    \"breathiness\": {\n      \"detected\": true,\n      \"severity\": \"mild\",\n      \"evidence\": \"Elevated high frequency energy ratio (0.53) and visible noise between harmonics\"\n    },\n    \"monotonicity\": {\n      \"detected\": true,\n      \"severity\": \"moderate\",\n      \"evidence\": \"Limited prosodic variation visible in fundamental frequency contour, reduced dynamic range in upper harmonics\"\n    }\n  },\n  \"clinical_interpretation\": {\n    \"summary\": \"The voice sample shows mild to moderate changes consistent with early voice alterations. Key findings include reduced pitch variability, mild breathiness, and some frequency instability, though notably without classical tremor.\",\n    \"key_concerns\": [\n      \"Reduced prosodic variation\",\n      \"Mild vocal breathiness\",\n      \"Frequency instability\"\n    ],\n    \"recommendation\": \"Suggest baseline neurological evaluation and longitudinal voice monitoring. Consider referral to speech language pathologist for detailed assessment.\"\n  },\n  \"limitations\": \"Single sample analysis without baseline comparison or demographic context. Environmental factors and recording conditions could affect results. Findings should be correlated with clinical examination and patient history.\"\n}",
+  "acoustic_features": {
+    "spectral_centroid_mean": 4183.554087196177,
+    "spectral_centroid_std": 113.25796202263194,
+    "tremor_band_ratio": 0.0,
+    "spectral_flatness_mean": NaN,
+    "frequency_stability": 113.25796202263194,
+    "high_freq_energy_ratio": 0.5345528721809387,
+    "duration_seconds": 10.869333333333334,
+    "num_frames": 1020
+  },
+  "metadata": {
+    "timestamp": "2025-10-05T02:16:32.828695",
+    "model": "claude-3-5-sonnet-20241022",
+    "spectrogram_path": "spectrograms/session_1759655748632_spectrogram.png",
+    "user_metadata": null
+  }
+}

@@ -54,6 +54,9 @@ const TypingTest = () => {
         if (data.band) {
           setAnalysisBand(data.band);
         }
+
+        // Store results in sessionStorage for Results page
+        sessionStorage.setItem('typingAnalysis', JSON.stringify(data));
       }
     };
 

@@ -47,9 +47,13 @@ This is a **research prototype** for early detection screening, not a diagnostic
    - Based on test results
 
 #### Current Implementation Status
-- ✅ Single-page structure exists
-- ⏳ Multi-page routing to be implemented
-- ⏳ State management for cross-page data flow
+- ✅ Multi-page routing implemented (Hero, Typing, Voice, Results, Research, Chat)
+- ✅ State management via sessionStorage (typing/voice results)
+- ✅ WebSocket real-time typing analysis with PD risk scoring
+- ✅ Voice recording + spectrogram + LLM analysis pipeline
+- ✅ Results aggregation page with multi-modal risk assessment
+- ✅ Research citations page with peer-reviewed sources
+- ✅ AI chatbot interface (mock RAG - ready for backend integration)
 
 ---
 
