@@ -1,0 +1,82 @@
+{
+  "session_id": "session_1759681482888",
+  "status": "incomplete",
+  "timestamp": 1759681486.470761,
+  "features": {
+    "hold_mean": NaN,
+    "hold_std": NaN,
+    "hold_median": NaN,
+    "hold_iqr": NaN,
+    "hold_mad": NaN,
+    "hold_cv": NaN,
+    "hold_p95": NaN,
+    "hold_p99": NaN,
+    "hold_min": NaN,
+    "hold_max": NaN,
+    "flight_mean": NaN,
+    "flight_std": NaN,
+    "flight_median": NaN,
+    "flight_iqr": NaN,
+    "flight_mad": NaN,
+    "flight_cv": NaN,
+    "flight_p95": NaN,
+    "flight_p99": NaN,
+    "flight_min": NaN,
+    "flight_max": NaN,
+    "pause_rate_p95": NaN,
+    "prop_left": 1.0,
+    "prop_right": 0.0,
+    "lr_imbalance_abs": 1.0,
+    "chars_per_sec": NaN,
+    "backspace_per_100chars": 0.0,
+    "n_chars": 1,
+    "n_press": 2,
+    "n_rel": 0
+  },
+  "session_data": {
+    "total_keystrokes": 2,
+    "total_releases": 0,
+    "backspaces": 0
+  },
+  "score_0to1": 0.14285714285714285,
+  "band": "LOW",
+  "rules_fired": [
+    {
+      "rule": "ASYMMETRY_HIGH",
+      "detail": {
+        "rz_lr_imbalance_abs": 22.8
+      }
+    }
+  ],
+  "robust_z": {
+    "hold_mean": NaN,
+    "hold_std": NaN,
+    "hold_median": NaN,
+    "hold_iqr": NaN,
+    "hold_mad": NaN,
+    "hold_cv": NaN,
+    "hold_p95": NaN,
+    "hold_p99": NaN,
+    "hold_min": NaN,
+    "hold_max": NaN,
+    "flight_mean": NaN,
+    "flight_std": NaN,
+    "flight_median": NaN,
+    "flight_iqr": NaN,
+    "flight_mad": NaN,
+    "flight_cv": NaN,
+    "flight_p95": NaN,
+    "flight_p99": NaN,
+    "flight_min": NaN,
+    "flight_max": NaN,
+    "pause_rate_p95": NaN,
+    "prop_left": 2.6899224806201554,
+    "prop_right": -1.0,
+    "lr_imbalance_abs": 22.8,
+    "chars_per_sec": NaN,
+    "backspace_per_100chars": -1.0,
+    "n_chars": -0.9915966386554622,
+    "n_press": -0.9877300613496932,
+    "n_rel": -1.0
+  }
+}

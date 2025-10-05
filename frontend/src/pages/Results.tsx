@@ -17,11 +17,20 @@ interface VoiceResults {
   acoustic_features?: any;
 }
 
+interface BlinkResults {
+  blinkCount: number;
+  duration: number;
+  blink_rate?: number;
+  risk_indicators?: any;
+}
+
 const ResultsPage = () => {
   const navigate = useNavigate();
   const [typingResults, setTypingResults] = useState<TypingResults | null>(null);
   const [voiceResults, setVoiceResults] = useState<VoiceResults | null>(null);
   const [parsedVoiceAnalysis, setParsedVoiceAnalysis] = useState<any>(null);
+  const [blinkResultsTyping, setBlinkResultsTyping] = useState<BlinkResults | null>(null);
+  const [blinkResultsVoice, setBlinkResultsVoice] = useState<BlinkResults | null>(null);
   const [overallRisk, setOverallRisk] = useState<number>(0);
   const [riskCategory, setRiskCategory] = useState<string>("unknown");
 
@@ -29,6 +38,8 @@ const ResultsPage = () => {
     // Load results from sessionStorage
     const typingData = sessionStorage.getItem('typingAnalysis');
     const voiceData = sessionStorage.getItem('voiceAnalysis');
+    const blinkTypingData = sessionStorage.getItem('blinkAnalysisTyping');
+    const blinkVoiceData = sessionStorage.getItem('blinkAnalysisVoice');
 
     if (typingData) {
       setTypingResults(JSON.parse(typingData));
@@ -61,18 +72,30 @@ const ResultsPage = () => {
       }
     }
 
+    if (blinkTypingData) {
+      setBlinkResultsTyping(JSON.parse(blinkTypingData));
+    }
+
+    if (blinkVoiceData) {
+      setBlinkResultsVoice(JSON.parse(blinkVoiceData));
+    }
+
     // Calculate overall risk
     calculateOverallRisk(
       typingData ? JSON.parse(typingData) : null,
-      voiceData ? JSON.parse(voiceData) : null
+      voiceData ? JSON.parse(voiceData) : null,
+      blinkTypingData ? JSON.parse(blinkTypingData) : null,
+      blinkVoiceData ? JSON.parse(blinkVoiceData) : null
     );
   }, []);
 
-  const calculateOverallRisk = (typing: any, voice: any) => {
+  const calculateOverallRisk = (typing: any, voice: any, blinkTyping: any, blinkVoice: any) => {
     const risks: number[] = [];
+    const weights: number[] = [];
 
     if (typing?.score_0to1 !== undefined) {
       risks.push(typing.score_0to1);
+      weights.push(0.30); // 30% weight
     }
 
     // Parse voice analysis
@@ -94,14 +117,34 @@ const ResultsPage = () => {
 
         if (parsed?.risk_assessment?.overall_risk_score !== undefined) {
           risks.push(parsed.risk_assessment.overall_risk_score);
+          weights.push(0.35); // 35% weight
         }
       } catch (e) {
         console.error("Failed to parse voice risk:", e);
       }
     }
 
+    // Add blink analysis (average of both tests)
+    const blinkRisks: number[] = [];
+    if (blinkTyping?.blink_rate !== undefined) {
+      // Normal: 15-20 blinks/min, PD: 5-10 blinks/min
+      const blinkRisk = Math.max(0.0, Math.min(1.0, (20 - blinkTyping.blink_rate) / 15));
+      blinkRisks.push(blinkRisk);
+    }
+    if (blinkVoice?.blink_rate !== undefined) {
+      const blinkRisk = Math.max(0.0, Math.min(1.0, (20 - blinkVoice.blink_rate) / 15));
+      blinkRisks.push(blinkRisk);
+    }
+    if (blinkRisks.length > 0) {
+      const avgBlinkRisk = blinkRisks.reduce((a, b) => a + b, 0) / blinkRisks.length;
+      risks.push(avgBlinkRisk);
+      weights.push(0.35); // 35% weight
+    }
+
     if (risks.length > 0) {
-      const avgRisk = risks.reduce((a, b) => a + b, 0) / risks.length;
+      // Calculate weighted average
+      const totalWeight = weights.reduce((a, b) => a + b, 0);
+      const avgRisk = risks.reduce((sum, risk, i) => sum + risk * weights[i], 0) / totalWeight;
       setOverallRisk(avgRisk);
 
       if (avgRisk < 0.3) {
@@ -294,15 +337,71 @@ const ResultsPage = () => {
             )}
           </Card>
 
-          {/* Eye Blink Results - Placeholder */}
-          <Card className="p-6 space-y-4 opacity-50">
+          {/* Eye Blink Results */}
+          <Card className="p-6 space-y-4">
             <div className="flex items-center gap-2">
               <Eye className="h-5 w-5 text-primary" />
               <h3 className="text-xl font-bold">Eye Blink Analysis</h3>
             </div>
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="text-sm">Coming soon</p>
-            </div>
+
+            {(blinkResultsTyping || blinkResultsVoice) ? (
+              <div className="space-y-4">
+                {blinkResultsTyping && (
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold text-muted-foreground">During Typing Test</div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Blink Count</span>
+                      <span className="font-semibold">{blinkResultsTyping.blinkCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Blink Rate</span>
+                      <span className="font-semibold">
+                        {blinkResultsTyping.blink_rate 
+                          ? `${blinkResultsTyping.blink_rate.toFixed(1)}/min`
+                          : `${((blinkResultsTyping.blinkCount / blinkResultsTyping.duration) * 60).toFixed(1)}/min`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Duration</span>
+                      <span className="font-semibold">{blinkResultsTyping.duration.toFixed(1)}s</span>
+                    </div>
+                  </div>
+                )}
+                
+                {blinkResultsVoice && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="text-sm font-semibold text-muted-foreground">During Voice Test</div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Blink Count</span>
+                      <span className="font-semibold">{blinkResultsVoice.blinkCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Blink Rate</span>
+                      <span className="font-semibold">
+                        {blinkResultsVoice.blink_rate 
+                          ? `${blinkResultsVoice.blink_rate.toFixed(1)}/min`
+                          : `${((blinkResultsVoice.blinkCount / blinkResultsVoice.duration) * 60).toFixed(1)}/min`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Duration</span>
+                      <span className="font-semibold">{blinkResultsVoice.duration.toFixed(1)}s</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t">
+                  <div className="text-xs text-muted-foreground">
+                    Normal blink rate: 15-20/min. Reduced rates may indicate PD symptoms.
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">No blink data available</p>
+                <p className="text-xs mt-2">Camera tracking was not enabled during tests</p>
+              </div>
+            )}
           </Card>
         </div>
 

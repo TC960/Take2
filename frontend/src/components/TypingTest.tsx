@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useBlinkTracker } from "@/hooks/use-blink-tracker";
+import { Eye } from "lucide-react";
 
 const SAMPLE_TEXT = "The early morning sun cast long shadows across the quiet street as people began their daily routines. Coffee shops opened their doors, releasing the rich aroma of freshly brewed espresso into the crisp air. Commuters hurried past, their footsteps echoing on the pavement while they checked their phones and sipped their drinks. In the park, joggers followed their familiar paths, weaving between dog walkers and early cyclists. The city was waking up, transforming from its peaceful nighttime slumber into the bustling hub of activity it would remain throughout the day. Each person moved with purpose, contributing to the complex choreography of urban life that played out every morning in cities around the world.";
 
@@ -19,6 +21,9 @@ const TypingTest = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const sessionIdRef = useRef<string>("");
   const lastKeypressRef = useRef<number>(0);
+  
+  // Blink tracking
+  const { blinkCount, isTracking, stopTracking } = useBlinkTracker(isActive && !isComplete);
 
   const words = SAMPLE_TEXT.split(" ");
   const typedWords = input.trim().split(" ");
@@ -91,6 +96,12 @@ const TypingTest = () => {
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
               wsRef.current.send(JSON.stringify({ type: "end" }));
             }
+            // Stop blink tracking and save data
+            stopTracking().then((blinkData) => {
+              if (blinkData) {
+                sessionStorage.setItem('blinkAnalysisTyping', JSON.stringify(blinkData));
+              }
+            });
             return 0;
           }
           return time - 1;
@@ -98,7 +109,7 @@ const TypingTest = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
+  }, [isActive, timeLeft, stopTracking]);
 
   // Input and metrics effect
   useEffect(() => {
@@ -201,7 +212,7 @@ const TypingTest = () => {
           <div className="text-sm text-muted-foreground">Time Remaining</div>
         </div>
 
-        <div className="flex justify-center gap-12 text-center">
+        <div className="flex justify-center gap-8 text-center flex-wrap">
           <div>
             <div className="text-3xl font-bold">{wpm}</div>
             <div className="text-sm text-muted-foreground">WPM</div>
@@ -209,6 +220,15 @@ const TypingTest = () => {
           <div>
             <div className="text-3xl font-bold">{accuracy}%</div>
             <div className="text-sm text-muted-foreground">Accuracy</div>
+          </div>
+          <div>
+            <div className="text-3xl font-bold flex items-center justify-center gap-2">
+              <Eye className="h-6 w-6 text-primary" />
+              {blinkCount}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {isTracking ? "Blinks" : "Blinks (tracking off)"}
+            </div>
           </div>
           {analysisScore !== null && (
             <div>

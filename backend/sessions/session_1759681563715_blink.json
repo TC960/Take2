@@ -1,0 +1,13 @@
+{
+  "session_id": "session_1759681563715",
+  "blink_count": 0,
+  "duration_seconds": 42.114899999856945,
+  "blink_rate": 0.0,
+  "variability": 0.0,
+  "risk_indicators": {
+    "reduced_blink_rate": true,
+    "increased_variability": false,
+    "blink_rate_percentile": "low"
+  },
+  "timestamp": "2025-10-05T09:26:03.715589"
+}

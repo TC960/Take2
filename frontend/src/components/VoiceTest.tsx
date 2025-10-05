@@ -1,17 +1,24 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mic, Square, Play } from "lucide-react";
+import { Mic, Square, Play, Eye, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useBlinkTracker } from "@/hooks/use-blink-tracker";
+import { useNavigate } from "react-router-dom";
 
 const VoiceTest = () => {
+  const navigate = useNavigate();
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
+  
+  // Blink tracking
+  const { blinkCount, isTracking, stopTracking } = useBlinkTracker(isRecording);
 
   const startRecording = async () => {
     try {
@@ -49,12 +56,18 @@ const VoiceTest = () => {
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (timerRef.current) {
         clearInterval(timerRef.current);
+      }
+      
+      // Stop blink tracking and save data
+      const blinkData = await stopTracking();
+      if (blinkData) {
+        sessionStorage.setItem('blinkAnalysisVoice', JSON.stringify(blinkData));
       }
     }
   };
@@ -66,9 +79,50 @@ const VoiceTest = () => {
     }
   };
 
-  const completeTest = () => {
-    setIsComplete(true);
-    document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+  const analyzeVoice = async () => {
+    if (!audioBlob) return;
+    
+    setIsAnalyzing(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const response = await fetch('http://localhost:8000/api/voice/analyze', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
+      
+      const result = await response.json();
+      console.log('[VoiceTest] Analysis result:', result);
+      
+      // Save to sessionStorage
+      sessionStorage.setItem('voiceAnalysis', JSON.stringify(result));
+      
+      toast({
+        title: "Analysis Complete",
+        description: "Voice analysis completed successfully!",
+      });
+      
+      // Navigate to results
+      setTimeout(() => {
+        navigate('/results');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('[VoiceTest] Voice analysis error:', error);
+      toast({
+        title: "Analysis Error",
+        description: "Failed to analyze voice recording. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -92,6 +146,14 @@ const VoiceTest = () => {
             <div className="text-6xl font-bold text-primary">
               {isRecording ? `${recordingTime}s` : audioBlob ? "✓" : "0s"}
             </div>
+            
+            {/* Blink counter */}
+            {isTracking && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Eye className="h-4 w-4" />
+                <span>Blinks tracked: {blinkCount}</span>
+              </div>
+            )}
             
             <div className="flex gap-4">
               {!audioBlob && !isRecording && (
@@ -139,14 +201,32 @@ const VoiceTest = () => {
           </div>
         </div>
 
-        {audioBlob && !isComplete && (
-          <Button onClick={completeTest} size="lg" className="w-full glow-primary">
-            Complete Assessment
+        {audioBlob && !isAnalyzing && (
+          <Button 
+            onClick={analyzeVoice} 
+            size="lg" 
+            className="w-full glow-primary"
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              "Analyze & View Results"
+            )}
           </Button>
+        )}
+        
+        {isAnalyzing && (
+          <div className="text-sm text-muted-foreground">
+            Analyzing your voice recording and eye blink patterns...
+          </div>
         )}
 
         <div className="text-xs text-muted-foreground pt-4">
-          Voice tremor analysis algorithm in development
+          Multi-modal analysis: Voice + Eye blink patterns
         </div>
       </Card>
     </section>

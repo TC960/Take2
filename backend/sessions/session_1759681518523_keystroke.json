@@ -1,0 +1,105 @@
+{
+  "session_id": "session_1759681518523",
+  "timestamp": 1759681563.7012439,
+  "features": {
+    "hold_mean": 0.12272727271643559,
+    "hold_std": 0.027190582757325738,
+    "hold_median": 0.11789999997615852,
+    "hold_iqr": 0.032800000011920516,
+    "hold_mad": 0.01635000002384257,
+    "hold_cv": 0.22155289656073637,
+    "hold_p95": 0.17006999995708377,
+    "hold_p99": 0.19457899987697586,
+    "hold_min": 0.08510000014305152,
+    "hold_max": 0.20089999985694895,
+    "flight_mean": 0.3464999999999998,
+    "flight_std": 0.6811775029352835,
+    "flight_median": 0.11595000004768341,
+    "flight_iqr": 0.12429999983310663,
+    "flight_mad": 0.07090000009536734,
+    "flight_cv": 1.9658802393514685,
+    "flight_p95": 1.658055000138282,
+    "flight_p99": 2.626351000030039,
+    "flight_min": 0.016599999904631346,
+    "flight_max": 2.8734999999999995,
+    "pause_rate_p95": 0.09090909090909091,
+    "prop_left": 0.47368421052631576,
+    "prop_right": 0.5263157894736842,
+    "lr_imbalance_abs": 0.05263157894736842,
+    "chars_per_sec": 2.131163421535224,
+    "backspace_per_100chars": 0.0,
+    "n_chars": 22,
+    "n_press": 22,
+    "n_rel": 23
+  },
+  "session_data": {
+    "total_keystrokes": 22,
+    "total_releases": 23,
+    "backspaces": 0
+  },
+  "score_0to1": 0.5714285714285714,
+  "band": "HIGH",
+  "rules_fired": [
+    {
+      "rule": "FLIGHT_VAR_HIGH",
+      "detail": {
+        "rz_flight_std": 8.601062369951414,
+        "rz_flight_mad": 2.5151759413810812,
+        "rz_flight_iqr": 1.9984199856191411
+      }
+    },
+    {
+      "rule": "HOLD_VAR_HIGH",
+      "detail": {
+        "rz_hold_std": 0.5345566392311826,
+        "rz_hold_mad": 2.5894292529550564,
+        "rz_hold_iqr": 2.160971291979374
+      }
+    },
+    {
+      "rule": "PAUSES_HIGH",
+      "detail": {
+        "rz_flight_p95": 8.166818182508505,
+        "rz_pause_rate_p95": 2.4759358288770055
+      }
+    },
+    {
+      "rule": "TIMING_SLOWED",
+      "detail": {
+        "rz_hold_median": 1.9166683744238635,
+        "rz_flight_median": 1.473552717310022
+      }
+    }
+  ],
+  "robust_z": {
+    "hold_mean": 1.809025251345655,
+    "hold_std": 0.5345566392311826,
+    "hold_median": 1.9166683744238635,
+    "hold_iqr": 2.160971291979374,
+    "hold_mad": 2.5894292529550564,
+    "hold_cv": 0.09259013495593021,
+    "hold_p95": 1.764555308320703,
+    "hold_p99": 0.9245672397818937,
+    "hold_min": 4.736289111316555,
+    "hold_max": -0.1693859397553925,
+    "flight_mean": 5.052656790076972,
+    "flight_std": 8.601062369951414,
+    "flight_median": 1.473552717310022,
+    "flight_iqr": 1.9984199856191411,
+    "flight_mad": 2.5151759413810812,
+    "flight_cv": 2.1725117425101237,
+    "flight_p95": 8.166818182508505,
+    "flight_p99": 6.213137944858129,
+    "flight_min": 100.07803981651192,
+    "flight_max": 3.620983562467055,
+    "pause_rate_p95": 2.4759358288770055,
+    "prop_left": 0.747858017135863,
+    "prop_right": 1.2984065668759055,
+    "lr_imbalance_abs": 0.25263157894736826,
+    "chars_per_sec": 0.17656400995110502,
+    "backspace_per_100chars": -1.0,
+    "n_chars": -0.8151260504201681,
+    "n_press": -0.8650306748466258,
+    "n_rel": -0.8588957055214724
+  }
+}
