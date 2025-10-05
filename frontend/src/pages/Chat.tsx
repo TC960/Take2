@@ -47,13 +47,39 @@ const ChatPage = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual RAG API endpoint
-      // For now, using a mock response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get user's test results from sessionStorage if available
+      const typingResults = sessionStorage.getItem('typingResults');
+      const voiceResults = sessionStorage.getItem('voiceResults');
+
+      const userResults: any = {};
+      if (typingResults) {
+        userResults.typing_results = JSON.parse(typingResults);
+      }
+      if (voiceResults) {
+        userResults.voice_results = JSON.parse(voiceResults);
+      }
+
+      // Call RAG API
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: input,
+          user_results: Object.keys(userResults).length > 0 ? userResults : null
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
 
       const assistantMessage: Message = {
         role: "assistant",
-        content: getMockResponse(input),
+        content: data.response,
         timestamp: new Date()
       };
 
@@ -62,7 +88,7 @@ const ChatPage = () => {
       console.error("Chat error:", error);
       const errorMessage: Message = {
         role: "assistant",
-        content: "I'm sorry, I encountered an error. Please try again.",
+        content: "I'm sorry, I encountered an error. Please try again. Make sure the backend server is running.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);

@@ -112,6 +112,14 @@ class AggregateAnalysisResponse(BaseModel):
     individual_results: Dict[str, Any]
     timestamp: str
 
+class ChatRequest(BaseModel):
+    message: str
+    user_results: Optional[Dict[str, Any]] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    timestamp: str
+
 # ============================================================================
 # Utility Functions
 # ============================================================================
@@ -668,6 +676,41 @@ async def list_sessions(limit: int = 10):
             pass
 
     return {"sessions": sessions, "total": len(sessions)}
+
+# ============================================================================
+# Chat Endpoint (RAG)
+# ============================================================================
+
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat(data: ChatRequest):
+    """
+    Chat endpoint using RAG (Retrieval Augmented Generation)
+
+    Args:
+        data: Chat message and optional user test results for context
+
+    Returns:
+        AI response based on RAG knowledge base and user context
+    """
+    try:
+        from rag import chat_with_context
+
+        # Get response from RAG system
+        response_text = chat_with_context(
+            query=data.message,
+            user_results=data.user_results
+        )
+
+        return ChatResponse(
+            response=response_text,
+            timestamp=datetime.now().isoformat()
+        )
+
+    except Exception as e:
+        import traceback
+        error_detail = f"Chat failed: {str(e)}\n{traceback.format_exc()}"
+        print(f"[ERROR] {error_detail}")
+        raise HTTPException(status_code=500, detail=error_detail)
 
 # ============================================================================
 # Run Server
