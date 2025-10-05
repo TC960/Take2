@@ -1,0 +1,2 @@
+hold_mean,hold_std,hold_median,hold_iqr,hold_mad,hold_cv,hold_p95,hold_p99,hold_min,hold_max,flight_mean,flight_std,flight_median,flight_iqr,flight_mad,flight_cv,flight_p95,flight_p99,flight_min,flight_max,pause_rate_p95,prop_left,prop_right,lr_imbalance_abs,backspace_per_100chars,chars_per_sec,n_chars,n_presses,n_releases
+,,,,,,,,,,,,,,,,,,,,,,,,0.0,,0,0,0
