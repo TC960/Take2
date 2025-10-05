@@ -85,9 +85,12 @@ class LLMAudioAnalyzer:
         # Parse response
         response_text = message.content[0].text
 
+        # Extract JSON from response (handle markdown code blocks)
+        parsed_json = self._extract_json_from_response(response_text)
+
         # Structure the analysis
         analysis = {
-            "raw_response": response_text,
+            "raw_response": parsed_json,  # Store the parsed JSON object
             "acoustic_features": acoustic_features,
             "metadata": {
                 "timestamp": datetime.now().isoformat(),
@@ -98,6 +101,35 @@ class LLMAudioAnalyzer:
         }
 
         return analysis
+
+    def _extract_json_from_response(self, response_text):
+        """Extract and parse JSON from LLM response, handling markdown code blocks"""
+        import re
+
+        # Try to find JSON in markdown code blocks
+        json_pattern = r'```(?:json)?\s*(\{.*?\})\s*```'
+        matches = re.findall(json_pattern, response_text, re.DOTALL)
+
+        if matches:
+            # Use the first JSON block found
+            json_str = matches[0]
+        else:
+            # Try to find raw JSON object
+            json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
+            matches = re.findall(json_pattern, response_text, re.DOTALL)
+            if matches:
+                # Use the largest JSON object (likely the complete response)
+                json_str = max(matches, key=len)
+            else:
+                # No JSON found, return the raw text
+                return response_text
+
+        # Parse the JSON
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError:
+            # If parsing fails, return the raw text
+            return response_text
 
     def _build_analysis_prompt(self, features, user_metadata):
         """Construct the analysis prompt with acoustic features and context"""

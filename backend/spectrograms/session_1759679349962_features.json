@@ -1,0 +1,20 @@
+{
+  "features": {
+    "spectral_centroid_mean": 4137.272408287698,
+    "spectral_centroid_std": 110.90503478529895,
+    "tremor_band_ratio": 0.0,
+    "spectral_flatness_mean": NaN,
+    "frequency_stability": 110.90503478529895,
+    "high_freq_energy_ratio": 0.5207917094230652,
+    "duration_seconds": 10.869333333333334,
+    "num_frames": 1020
+  },
+  "metadata": {
+    "wav_path": "audio_sessions/session_1759679349962.wav",
+    "sample_rate": 48000,
+    "duration": 10.92,
+    "n_fft": 2048,
+    "hop_length": 512,
+    "timestamp": "2025-10-05T08:49:14.126524"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "raw_response": "# Voice Spectrogram Analysis for PD Biomarkers\n\nAfter examining the spectrogram and acoustic features provided, I've prepared a detailed analysis of potential Parkinson's Disease vocal biomarkers.\n\n```json\n{\n  \"risk_assessment\": {\n    \"overall_risk_score\": 0.25,\n    \"confidence\": 0.7,\n    \"risk_category\": \"low\"\n  },\n  \"biomarker_findings\": {\n    \"vocal_tremor\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"The tremor band ratio is 0.0, and visual inspection shows no periodic modulation in the 4-6 Hz range typical of PD vocal tremor.\"\n    },\n    \"frequency_instability\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"The frequency stability measure is high (91.64), and spectral centroid shows consistent patterns. Harmonics appear well-defined in speech segments without significant perturbations.\"\n    },\n    \"breathiness\": {\n      \"detected\": true,\n      \"severity\": \"mild\",\n      \"evidence\": \"The high frequency energy ratio of 0.52 suggests some breathiness, and the spectrogram shows moderate noise components between harmonic bands in the 2-5kHz range.\"\n    },\n    \"monotonicity\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"The spectrogram displays good prosodic variation with clear pitch contours and frequency modulations during speech segments (4-6s and 7-10s).\"\n    }\n  },\n  \"clinical_interpretation\": {\n    \"summary\": \"The voice sample shows minimal to no PD-typical characteristics, with good frequency stability and absence of vocal tremor. Mild breathiness is noted but could be within normal range or related to other factors.\",\n    \"key_concerns\": [\"Mild breathiness that warrants monitoring over time\"],\n    \"recommendation\": \"Low concern for PD-related vocal changes. Recommend baseline recording for future comparison rather than immediate clinical follow-up.\"\n  },\n  \"limitations\": \"This analysis is based on a single short sample which may not capture the full range of vocal behaviors. Background noise could affect some measurements. No demographic information (age, gender) was provided which limits contextualization of findings. Spectral flatness measure returned NaN, limiting comprehensive assessment of monotonicity.\"\n}\n```\n\nThe spectrogram shows two clear speech segments (around 4-6 seconds and 7-10 seconds) with well-defined harmonic structures and formant transitions typical of healthy speech. The absence of regular amplitude modulations in the 4-6 Hz range strongly suggests no pathological tremor is present.",
+  "acoustic_features": {
+    "spectral_centroid_mean": 4124.140727169293,
+    "spectral_centroid_std": 91.6447327676752,
+    "tremor_band_ratio": 0.0,
+    "spectral_flatness_mean": NaN,
+    "frequency_stability": 91.6447327676752,
+    "high_freq_energy_ratio": 0.519207775592804,
+    "duration_seconds": 10.869333333333334,
+    "num_frames": 1020
+  },
+  "metadata": {
+    "timestamp": "2025-10-05T08:50:07.954205",
+    "model": "claude-3-7-sonnet-20250219",
+    "spectrogram_path": "spectrograms/session_1759679394404_spectrogram.png",
+    "user_metadata": null
+  }
+}

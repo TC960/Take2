@@ -1,0 +1,19 @@
+{
+  "raw_response": "# Voice Spectrogram Analysis for Parkinson's Disease Biomarkers\n\nAfter examining the provided spectrogram and acoustic features, I've performed a comprehensive analysis of the voice sample for potential Parkinson's Disease vocal biomarkers.\n\n```json\n{\n  \"risk_assessment\": {\n    \"overall_risk_score\": 0.25,\n    \"confidence\": 0.65,\n    \"risk_category\": \"low\"\n  },\n  \"biomarker_findings\": {\n    \"vocal_tremor\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"Tremor band ratio is 0.0, and visual inspection shows no consistent 4-6Hz modulation pattern typical of PD tremor\"\n    },\n    \"frequency_instability\": {\n      \"detected\": true,\n      \"severity\": \"mild\",\n      \"evidence\": \"Spectral centroid stability value of 110.91 shows some variation, but within normal range. Spectrogram shows relatively consistent harmonic structure\"\n    },\n    \"breathiness\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"High frequency energy ratio of 0.52 is normal. Spectrogram shows good energy distribution across formant structure without excessive noise artifacts\"\n    },\n    \"monotonicity\": {\n      \"detected\": false,\n      \"severity\": \"none\",\n      \"evidence\": \"Spectrogram displays appropriate prosodic variation across time. Good variation in harmonic intensity and frequency range\"\n    }\n  },\n  \"clinical_interpretation\": {\n    \"summary\": \"This voice sample presents largely normal acoustic characteristics with minimal indications of PD-related vocal changes. Only mild frequency instability was detected, but this finding alone is insufficient to suggest PD-related dysphonia.\",\n    \"key_concerns\": [\"Mild frequency instability\"],\n    \"recommendation\": \"No immediate voice-related concerns requiring clinical follow-up. Consider longitudinal monitoring if there are other non-voice PD symptoms or family history.\"\n  },\n  \"limitations\": \"Analysis is based on a single voice sample without baseline comparison. Spectral flatness data is missing (NaN). No context about the speaker's age, gender, or medical history was provided, which limits personalized interpretation. This screening tool should not be used for diagnosis.\"\n}\n```\n\nThe spectrogram shows normal speech patterns with good harmonic structure extending up to the higher frequencies (5000-7000 Hz), which is indicative of healthy voice production. The spectral centroid of 4137.3 Hz falls within normal ranges, and most importantly, there is no evidence of the characteristic 4-6 Hz tremor that is often associated with Parkinson's Disease.",
+  "acoustic_features": {
+    "spectral_centroid_mean": 4137.272408287698,
+    "spectral_centroid_std": 110.90503478529895,
+    "tremor_band_ratio": 0.0,
+    "spectral_flatness_mean": NaN,
+    "frequency_stability": 110.90503478529895,
+    "high_freq_energy_ratio": 0.5207917094230652,
+    "duration_seconds": 10.869333333333334,
+    "num_frames": 1020
+  },
+  "metadata": {
+    "timestamp": "2025-10-05T08:49:26.574353",
+    "model": "claude-3-7-sonnet-20250219",
+    "spectrogram_path": "spectrograms/session_1759679349962_spectrogram.png",
+    "user_metadata": null
+  }
+}

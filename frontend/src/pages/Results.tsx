@@ -41,9 +41,19 @@ const ResultsPage = () => {
       // Parse LLM raw_response if it's a string
       if (voice?.llm_analysis?.raw_response) {
         try {
-          const parsed = typeof voice.llm_analysis.raw_response === 'string'
-            ? JSON.parse(voice.llm_analysis.raw_response)
-            : voice.llm_analysis.raw_response;
+          let parsed;
+          if (typeof voice.llm_analysis.raw_response === 'string') {
+            // Try to extract JSON from markdown code blocks
+            const jsonMatch = voice.llm_analysis.raw_response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+            if (jsonMatch) {
+              parsed = JSON.parse(jsonMatch[1]);
+            } else {
+              // Try direct parsing
+              parsed = JSON.parse(voice.llm_analysis.raw_response);
+            }
+          } else {
+            parsed = voice.llm_analysis.raw_response;
+          }
           setParsedVoiceAnalysis(parsed);
         } catch (e) {
           console.error("Failed to parse LLM response:", e);
@@ -68,9 +78,19 @@ const ResultsPage = () => {
     // Parse voice analysis
     if (voice?.llm_analysis?.raw_response) {
       try {
-        const parsed = typeof voice.llm_analysis.raw_response === 'string'
-          ? JSON.parse(voice.llm_analysis.raw_response)
-          : voice.llm_analysis.raw_response;
+        let parsed;
+        if (typeof voice.llm_analysis.raw_response === 'string') {
+          // Try to extract JSON from markdown code blocks
+          const jsonMatch = voice.llm_analysis.raw_response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+          if (jsonMatch) {
+            parsed = JSON.parse(jsonMatch[1]);
+          } else {
+            // Try direct parsing
+            parsed = JSON.parse(voice.llm_analysis.raw_response);
+          }
+        } else {
+          parsed = voice.llm_analysis.raw_response;
+        }
 
         if (parsed?.risk_assessment?.overall_risk_score !== undefined) {
           risks.push(parsed.risk_assessment.overall_risk_score);
